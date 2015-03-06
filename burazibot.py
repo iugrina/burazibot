@@ -2,12 +2,11 @@
 
 from jabby.jabberbot import JabberBot, botcmd
 import datetime
-import os
 from ConfigParser import SafeConfigParser
 import pickle
 
 
-class SystemInfoJabberBot(JabberBot):
+class BuraziBot(JabberBot):
     @botcmd
     def printhistory(self, mess, args):
         """print history up to x last lines (default 10)"""
@@ -79,10 +78,10 @@ if __name__ == "__main__":
     else:
         secure = None
 
-    bot = SystemInfoJabberBot(conf.get("xmpp", "username"),
-                              conf.get("xmpp", "pass"),
-                              histfile=conf.get("local", "histfile"),
-                              secure=secure,
-                              debug=False)
+    bot = BuraziBot(conf.get("xmpp", "username"),
+                    conf.get("xmpp", "pass"),
+                    histfile=conf.get("local", "histfile"),
+                    secure=secure,
+                    debug=True)
     bot.join_room(conf.get("xmpp", "room"))
     bot.serve_forever()
