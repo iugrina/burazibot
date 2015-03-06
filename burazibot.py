@@ -18,12 +18,17 @@ class SystemInfoJabberBot(JabberBot):
         return "\n" + "\n".join(self.history[lines:])
 
     @botcmd
-    def gettags (self, mess, args):
+    def gettags(self, mess, args):
         """print stuff taged with tag"""
         if args in self.tags:
             return "\n" + "\n".join(self.tags[args])
         else:
             return "Nema nis buraz!"
+
+    @botcmd
+    def infotags(self, mess, args):
+        """Returns tags that are currently in use"""
+        return "\n" + " ".join(self.tags.keys())
 
     @botcmd
     def serverinfo(self, mess, args):
@@ -72,6 +77,7 @@ if __name__ == "__main__":
     bot = SystemInfoJabberBot(conf.get("xmpp", "username"),
                               conf.get("xmpp", "pass"),
                               histfile=conf.get("local", "histfile"),
+                              secure=int(conf.get("tls", "enabled")),
                               debug=False)
     bot.join_room(conf.get("xmpp", "room"))
     bot.serve_forever()
