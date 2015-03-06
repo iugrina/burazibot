@@ -49,6 +49,8 @@ import inspect
 import logging
 import traceback
 
+import pickle
+
 # Will be parsed by setup.py to determine package metadata
 __author__ = 'Thomas Perl <m@thp.io>'
 __version__ = '0.15'
@@ -95,7 +97,7 @@ class JabberBot(object):
 
     def __init__(self, username, password, res=None, debug=False,
             privatedomain=False, acceptownmsgs=False, handlers=None,
-            command_prefix='', secure=None):
+            command_prefix='', secure=None, histfile=""):
         """Initializes the jabber bot and sets up commands.
 
         username and password should be clear ;)
@@ -147,8 +149,19 @@ class JabberBot(object):
         self.__acceptownmsgs = acceptownmsgs
         self.__command_prefix = command_prefix
 
-        self.history = list()
-        self.tags = dict()
+        self.histfile = histfile
+
+        # get history
+        try:
+            f = open(self.histfile)
+            tmp = pickle.load(f)
+            self.history = tmp[0]
+            self.tags = tmp[1]
+            f.close()
+        except IOError:
+            self.log.info("No history/tags file available")
+            self.history = list()
+            self.tags = dict()
 
         # TLS or not to TLS
         self.secure = secure
@@ -587,16 +600,24 @@ class JabberBot(object):
         cmd = command.lower()
         self.log.debug("*** cmd = %s" % cmd)
 
-        self.history.append("%s+%s :: %s" % (username[:-1], username[-1:], text))
+        #
+        # add history
+        #
+        self.history.append("%s+%s :: %s" % (username[:-1],
+                                             username[-1:], text))
 
+        #
         # check if the message is tagged
-        stripsplit  = [x.rstrip() for x in text.rsplit("++")]
+        #
+        stripsplit = [x.rstrip() for x in text.rsplit("++")]
         if len(stripsplit) > 1:
             for tag in stripsplit[1:]:
                 if tag in self.tags:
                     self.tags[tag].append(stripsplit[0])
                 else:
-                    self.tags[tag] = ["%s_%s: %s" % (username[:-1], username[-1:], stripsplit[0])]
+                    self.tags[tag] = ["%s_%s: %s" % (username[:-1],
+                                                     username[-1:],
+                                                     stripsplit[0])]
 
         if cmd in self.commands:
             def execute_and_send():

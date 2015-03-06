@@ -4,6 +4,7 @@ from jabby.jabberbot import JabberBot, botcmd
 import datetime
 import os
 from ConfigParser import SafeConfigParser
+import pickle
 
 
 class SystemInfoJabberBot(JabberBot):
@@ -47,7 +48,21 @@ class SystemInfoJabberBot(JabberBot):
         """Tells you your username"""
         return mess.getFrom().getStripped()
 
+    @botcmd
+    def writehistfile(self, mess, args):
+        """Writes the history/tags to the disk"""
+        try:
+            f = open(self.histfile, "w")
+            pickle.dump((self.history, self.tags), f)
+            f.close()
+            return "Fajl snimljen buraz!"
+        except IOError:
+            self.log.info("No history/tags file available")
+            return "Niman di da sniman, e!"
 
+    def shutdown(self):
+        self.writehistfile("", "")
+        pass
 
 if __name__ == "__main__":
 
@@ -56,6 +71,7 @@ if __name__ == "__main__":
 
     bot = SystemInfoJabberBot(conf.get("xmpp", "username"),
                               conf.get("xmpp", "pass"),
+                              histfile=conf.get("local", "histfile"),
                               debug=False)
     bot.join_room(conf.get("xmpp", "room"))
     bot.serve_forever()
