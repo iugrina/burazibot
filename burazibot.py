@@ -76,6 +76,8 @@ if __name__ == "__main__":
 
     if conf.get("tls", "enabled") != "":
         secure = int(conf.get("tls", "enabled"))
+    else:
+        secure = None
 
     bot = SystemInfoJabberBot(conf.get("xmpp", "username"),
                               conf.get("xmpp", "pass"),
