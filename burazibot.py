@@ -74,10 +74,13 @@ if __name__ == "__main__":
     conf = SafeConfigParser()
     conf.read("./vars.ini")
 
+    if conf.get("tls", "enabled") != "":
+        secure = int(conf.get("tls", "enabled"))
+
     bot = SystemInfoJabberBot(conf.get("xmpp", "username"),
                               conf.get("xmpp", "pass"),
                               histfile=conf.get("local", "histfile"),
-                              secure=int(conf.get("tls", "enabled")),
+                              secure=secure,
                               debug=False)
     bot.join_room(conf.get("xmpp", "room"))
     bot.serve_forever()
