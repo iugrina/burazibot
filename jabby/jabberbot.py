@@ -620,7 +620,7 @@ class JabberBot(object):
                                                      stripsplit[0])]
 
         if cmd in self.commands:
-            def execute_and_send():
+            def execute_and_send(private=False):
                 try:
                     reply = self.commands[cmd](mess, args)
                 except Exception, e:
@@ -629,13 +629,18 @@ class JabberBot(object):
                         (text, jid, traceback.format_exc(e)))
                     reply = self.MSG_ERROR_OCCURRED
                 if reply:
-                    self.send_simple_reply(mess, reply)
+                    self.send_simple_reply(mess, reply, private=private)
+            if type=="chat":
+                private = True
+            else:
+                private = False
             # Experimental!
             # if command should be executed in a seperate thread do it
             if self.commands[cmd]._jabberbot_command_thread:
-                thread.start_new_thread(execute_and_send, ())
+                thread.start_new_thread(execute_and_send, (),
+                                        {'private': private})
             else:
-                execute_and_send()
+                execute_and_send(private)
         else:
             # In private chat, it's okay for the bot to always respond.
             # In group chat, the bot should silently ignore commands it
