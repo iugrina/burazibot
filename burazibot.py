@@ -38,4 +38,5 @@ if __name__ == "__main__":
 
     bot = SystemInfoJabberBot(conf.get("xmpp", "username"),
                               conf.get("xmpp", "pass"))
-    bot.serve_forever_boy()
+    bot.join_room(conf.get("xmpp", "room"))
+    bot.serve_forever()
