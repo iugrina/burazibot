@@ -150,6 +150,9 @@ class JabberBot(object):
         self.history = list()
         self.tags = dict()
 
+        # TLS or not to TLS
+        self.secure = secure
+
         self.handlers = (handlers or [('message', self.callback_message),
                     ('presence', self.callback_presence)])
 
@@ -211,7 +214,7 @@ class JabberBot(object):
                 conn = xmpp.Client(self.jid.getDomain(), debug=[])
 
             #connection attempt
-            conres = conn.connect(self.secure)
+            conres = conn.connect(secure=self.secure)
             if not conres:
                 self.log.error('unable to connect to server %s.' %
                         self.jid.getDomain())
