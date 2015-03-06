@@ -1,12 +1,29 @@
 #!/usr/bin/python
 
-from jabberbot import JabberBot, botcmd
+from jabby.jabberbot import JabberBot, botcmd
 import datetime
 import os
 from ConfigParser import SafeConfigParser
 
 
 class SystemInfoJabberBot(JabberBot):
+    @botcmd
+    def printhistory(self, mess, args):
+        """print history up to x last lines (default 10)"""
+        try:
+            lines = -1 * int(args)
+        except:
+            lines = -10
+        return "\n" + "\n".join(self.history[lines:])
+
+    @botcmd
+    def gettags (self, mess, args):
+        """print stuff taged with tag"""
+        if args in self.tags:
+            return "\n" + "\n".join(self.tags[args])
+        else:
+            return "Nema nis buraz!"
+
     @botcmd
     def serverinfo(self, mess, args):
         """Displays information about the server"""
@@ -31,12 +48,14 @@ class SystemInfoJabberBot(JabberBot):
         return mess.getFrom().getStripped()
 
 
+
 if __name__ == "__main__":
 
     conf = SafeConfigParser()
     conf.read("./vars.ini")
 
     bot = SystemInfoJabberBot(conf.get("xmpp", "username"),
-                              conf.get("xmpp", "pass"))
+                              conf.get("xmpp", "pass"),
+                              debug=False)
     bot.join_room(conf.get("xmpp", "room"))
     bot.serve_forever()
