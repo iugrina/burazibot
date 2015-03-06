@@ -1,1 +1,6 @@
 irc.py
+*.pyc
+*.rope*
+*.dat
+*.bak
+*.sw*
